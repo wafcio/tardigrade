@@ -1,3 +1,4 @@
+require "tardigrade/dependency"
 require "tardigrade/injector"
 require "tardigrade/version"
 
