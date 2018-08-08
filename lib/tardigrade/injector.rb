@@ -17,19 +17,30 @@ module Tardigrade
         end
       end
 
+      def call_dependency(instance, dep_name, klass, &block)
+        unless instance.instance_variable_get(:"@#{dep_name}")
+          dep_object = build_dependency(instance, klass)
+          result = block.call(dep_object)
+          instance.instance_variable_set(:"@#{dep_name}", result)
+        end
+        instance.instance_variable_get(:"@#{dep_name}")
+      end
+
       def import(*dependency_names)
-        dependency_names.each do |dependency_name|
-          klass = Tardigrade.dependencies[dependency_name]
+        dependency_names.each do |dep_name|
+          klass = Tardigrade.dependencies[dep_name]
 
           if klass.instance_method(:call).arity == 0
-            define_method(dependency_name) do
-              dep_object = self.class.build_dependency(self, klass)
-              dep_object.call
+            define_method(dep_name) do
+              self.class.call_dependency(self, dep_name, klass) do |dep_object|
+                dep_object.call
+              end
             end
           else
-            define_method(dependency_name) do |*args|
-              dep_object = self.class.build_dependency(self, klass)
-              dep_object.call(*args)
+            define_method(dep_name) do |*args|
+              self.class.call_dependency(self, dep_name, klass) do |dep_object|
+                dep_object.call(*args)
+              end
             end
           end
         end

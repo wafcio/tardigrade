@@ -171,4 +171,50 @@ RSpec.describe Tardigrade::Injector do
       expect(obj.params).to eq({ arg1: :value1 })
     end
   end
+
+  describe "cache dependency result" do
+    let(:dependency_class) do
+      Class.new do
+        def call; end
+      end
+    end
+
+    let(:dependency_class1) do
+      Class.new do
+        def call
+          SecureRandom.hex
+        end
+      end
+    end
+
+    let(:dependency_class2) do
+      Class.new do
+        include Tardigrade::Dependency
+
+        with :foo1
+
+        def call
+          foo1
+        end
+      end
+    end
+
+    before do
+      Tardigrade.instance_variable_set(:@dependencies, nil)
+      Tardigrade.add_dependency(:foo1, dependency_class1)
+      Tardigrade.add_dependency(:foo2, dependency_class2)
+
+      @service_class = Class.new do
+        include Tardigrade::Injector
+
+        import :foo1, :foo2
+      end
+    end
+
+    it "allow to call .foo" do
+      foo1_result = service.foo1
+      expect(service.foo1).to eq(foo1_result)
+      expect(service.foo2).to eq(foo1_result)
+    end
+  end
 end
