@@ -1,5 +1,12 @@
 require "tardigrade/version"
 
 module Tardigrade
-  # Your code goes here...
+  def self.add_dependency(name, klass)
+    @dependencies ||= {}
+    @dependencies[name] = klass
+  end
+
+  def self.dependencies
+    @dependencies || {}
+  end
 end
