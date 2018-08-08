@@ -1,3 +1,4 @@
+require "tardigrade/injector"
 require "tardigrade/version"
 
 module Tardigrade
