@@ -76,6 +76,24 @@ end
 Action.new(name: "John").foo # => "John"
 ```
 
+### Testing
+
+You can easily test dependency without main object:
+
+```ruby
+class Foo
+  include Tardigrade::Dependency
+  
+  with :name
+
+  def call
+    name  
+  end
+end
+
+Foo.new(name: "John").call # => "John"
+```
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/wafcio/tardigrade.
