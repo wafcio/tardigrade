@@ -13,16 +13,28 @@ RSpec.describe Tardigrade::Injector do
   end
 
   context "without arguments" do
-    let(:dependency_class) do
-      Class.new do
-        def call
-          :foo
+    context "with dependency class" do
+      let(:dependency_class) do
+        Class.new do
+          def call
+            :foo
+          end
         end
+      end
+
+      it "allow to call .foo" do
+        expect(service.foo).to eq(:foo)
       end
     end
 
-    it "allow to call .foo" do
-      expect(service.foo).to eq(:foo)
+    context "with dependency as lambda" do
+      let(:dependency_class) do
+        -> { :foo }
+      end
+
+      it "allow to call .foo" do
+        expect(service.foo).to eq(:foo)
+      end
     end
   end
 

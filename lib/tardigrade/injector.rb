@@ -13,7 +13,7 @@ module Tardigrade
           end
           dep_klass.new(arguments)
         else
-          dep_klass.new
+          dep_klass.respond_to?(:call) ? dep_klass : dep_klass.new
         end
       end
 
@@ -26,11 +26,19 @@ module Tardigrade
         instance.instance_variable_get(:"@#{dep_name}")
       end
 
+      def call_method(klass)
+        if klass.respond_to?(:call)
+          klass.method(:call)
+        else
+          klass.instance_method(:call)
+        end
+      end
+
       def import(*dependency_names)
         dependency_names.each do |dep_name|
           klass = Tardigrade.dependencies[dep_name]
 
-          if klass.instance_method(:call).arity == 0
+          if call_method(klass).arity == 0
             define_method(dep_name) do
               self.class.call_dependency(self, dep_name, klass) do |dep_object|
                 dep_object.call

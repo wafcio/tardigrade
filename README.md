@@ -41,6 +41,16 @@ end
 Action.new.foo # => :foo_response
 ```
 
+### Dependencies
+
+Dependency can be:
+* lambda, proc
+* class with `call` class method
+* module with `self.call` method
+* class with `call` instance method
+
+Class with `call` instance method can have context only.
+
 ### Context
 
 The biggest advantage of `Tardigarde` is having context by dependency:
