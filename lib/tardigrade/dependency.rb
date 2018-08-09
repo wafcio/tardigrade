@@ -16,7 +16,7 @@ module Tardigrade
               end
 
               instance_variable_set(:"@#{arg_name}", args[arg_name])
-              self.class.attr_reader :"#{arg_name}"
+              self.class.send(:attr_reader, :"#{arg_name}")
             end
           end
         end

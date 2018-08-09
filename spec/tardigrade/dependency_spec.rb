@@ -65,4 +65,14 @@ RSpec.describe Tardigrade::Dependency do
       klass.new(foo: :foo)
     }.to raise_error(ArgumentError).with_message("argument :bar missing")
   end
+
+  it "access to context method" do
+    klass = Class.new do
+      include Tardigrade::Dependency
+
+      with :foo
+    end
+
+    expect(klass.new(foo: :foo).foo).to eq(:foo)
+  end
 end
