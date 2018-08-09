@@ -17,15 +17,6 @@ module Tardigrade
         end
       end
 
-      def call_dependency(instance, dep_name, klass, &block)
-        unless instance.instance_variable_get(:"@#{dep_name}")
-          dep_object = build_dependency(instance, klass)
-          result = block.call(dep_object)
-          instance.instance_variable_set(:"@#{dep_name}", result)
-        end
-        instance.instance_variable_get(:"@#{dep_name}")
-      end
-
       def call_method(klass)
         if klass.respond_to?(:call)
           klass.method(:call)
@@ -34,21 +25,29 @@ module Tardigrade
         end
       end
 
+      def cache(name, value, memoize)
+        if memoize
+          RequestStore.store[:"tardigrade_#{name}"] ||= value
+        else
+          value
+        end
+      end
+
       def import(*dependency_names)
         dependency_names.each do |dep_name|
-          klass = Tardigrade.dependencies[dep_name]
+          dep = Tardigrade.dependencies[dep_name]
+          klass = dep[:class]
+          memoize = dep[:memoize]
 
           if call_method(klass).arity == 0
             define_method(dep_name) do
-              self.class.call_dependency(self, dep_name, klass) do |dep_object|
-                dep_object.call
-              end
+              result = self.class.build_dependency(self, klass).call
+              self.class.cache(dep_name, result, memoize)
             end
           else
             define_method(dep_name) do |*args|
-              self.class.call_dependency(self, dep_name, klass) do |dep_object|
-                dep_object.call(*args)
-              end
+              result = self.class.build_dependency(self, klass).call(*args)
+              self.class.cache(dep_name, result, memoize)
             end
           end
         end

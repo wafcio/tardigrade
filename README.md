@@ -86,6 +86,15 @@ end
 Action.new(name: "John").foo # => "John"
 ```
 
+### Memoization
+
+You can tell tardigrade to memoize method after first call. To do it write:
+```ruby
+Tardigrade.add_dependency :foo, Foo, memoize: true
+```
+
+As cache store `tardigrade` uses `request_store` gem which you can use with [Ruby on Rails application](https://github.com/steveklabnik/request_store#the-solution) and with [Rack application](https://github.com/steveklabnik/request_store#no-rails-no-problem).
+
 ### Testing
 
 You can easily test dependency without main object:

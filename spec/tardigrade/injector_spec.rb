@@ -184,7 +184,7 @@ RSpec.describe Tardigrade::Injector do
     end
   end
 
-  describe "cache dependency result" do
+  describe "cache dependency result through many dependencies" do
     let(:dependency_class) do
       Class.new do
         def call; end
@@ -213,8 +213,8 @@ RSpec.describe Tardigrade::Injector do
 
     before do
       Tardigrade.instance_variable_set(:@dependencies, nil)
-      Tardigrade.add_dependency(:foo1, dependency_class1)
-      Tardigrade.add_dependency(:foo2, dependency_class2)
+      Tardigrade.add_dependency(:foo1, dependency_class1, memoize: true)
+      Tardigrade.add_dependency(:foo2, dependency_class2, memoize: true)
 
       @service_class = Class.new do
         include Tardigrade::Injector
@@ -227,6 +227,42 @@ RSpec.describe Tardigrade::Injector do
       foo1_result = service.foo1
       expect(service.foo1).to eq(foo1_result)
       expect(service.foo2).to eq(foo1_result)
+    end
+  end
+
+  describe "cache dependency result through many service classes" do
+    let(:dependency_class) do
+      Class.new do
+        def call
+          SecureRandom.hex
+        end
+      end
+    end
+
+    before do
+      Tardigrade.instance_variable_set(:@dependencies, nil)
+      Tardigrade.add_dependency(:foo, dependency_class, memoize: true)
+
+      @service_class = Class.new do
+        include Tardigrade::Injector
+
+        import :foo
+      end
+
+      @another_service_class = Class.new do
+        include Tardigrade::Injector
+
+        import :foo
+      end
+    end
+
+    it "allow to call .foo" do
+      service = @service_class.new
+      another_service = @another_service_class.new
+
+      foo_result = service.foo
+      expect(service.foo).to eq(foo_result)
+      expect(another_service.foo).to eq(foo_result)
     end
   end
 end
