@@ -25,7 +25,7 @@ module Tardigrade
         end
       end
 
-      def cache(name, value, memoize)
+      def pass_through_or_cache(name, value, memoize)
         if memoize
           RequestStore.store[:"tardigrade_#{name}"] ||= value
         else
@@ -36,20 +36,27 @@ module Tardigrade
       def import(*dependency_names)
         dependency_names.each do |dependency_name|
           dependency = Tardigrade.dependencies[dependency_name]
-          source = dependency[:source]
-          memoize = dependency[:memoize]
+          source, memoize = dependency[:source], dependency[:memoize]
 
           if call_method(source).arity == 0
-            define_method(dependency_name) do
-              result = self.class.build_dependency(self, source).call
-              self.class.cache(dependency_name, result, memoize)
-            end
+            define_dependency_method_without_arguments(dependency_name, source, memoize)
           else
-            define_method(dependency_name) do |*args|
-              result = self.class.build_dependency(self, source).call(*args)
-              self.class.cache(dependency_name, result, memoize)
-            end
+            define_dependency_method_with_arguments(dependency_name, source, memoize)
           end
+        end
+      end
+
+      def define_dependency_method_without_arguments(dependency_name, source, memoize)
+        define_method(dependency_name) do
+          result = self.class.build_dependency(self, source).call
+          self.class.pass_through_or_cache(dependency_name, result, memoize)
+        end
+      end
+
+      def define_dependency_method_with_arguments(dependency_name, source, memoize)
+        define_method(dependency_name) do |*args|
+          result = self.class.build_dependency(self, source).call(*args)
+          self.class.pass_through_or_cache(dependency_name, result, memoize)
         end
       end
     end
