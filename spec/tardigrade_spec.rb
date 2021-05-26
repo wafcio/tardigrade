@@ -34,4 +34,83 @@ RSpec.describe Tardigrade do
                bar: { source: String, memoize: false })
     end
   end
+
+  describe "dependencies saved as different data type" do
+    context "dependency as lambda" do
+      let(:dependency) do
+        -> { :foo_response }
+      end
+
+      it "returns saved dependecy" do
+        Tardigrade.add_dependency(:foo, dependency)
+
+        expect(Tardigrade.dependencies)
+          .to eq(foo: { source: dependency, memoize: false })
+      end
+    end
+
+    context "dependency as Proc" do
+      let(:dependency) do
+        Proc.new { :foo_response }
+      end
+
+      it "returns saved dependecy" do
+        Tardigrade.add_dependency(:foo, dependency)
+
+        expect(Tardigrade.dependencies)
+          .to eq(foo: { source: dependency, memoize: false })
+      end
+    end
+
+    context "dependency as class with .call" do
+      let(:dependency) do
+        Class.new do
+          def self.call
+            :foo_response
+          end
+        end
+      end
+
+      it "returns saved dependecy" do
+        Tardigrade.add_dependency(:foo, dependency)
+
+        expect(Tardigrade.dependencies)
+          .to eq(foo: { source: dependency, memoize: false })
+      end
+    end
+
+    context "dependency as class with #call" do
+      let(:dependency) do
+        Class.new do
+          def call
+            :foo_response
+          end
+        end
+      end
+
+      it "returns saved dependecy" do
+        Tardigrade.add_dependency(:foo, dependency)
+
+        expect(Tardigrade.dependencies)
+          .to eq(foo: { source: dependency, memoize: false })
+      end
+    end
+
+    context "dependency as module with self.call" do
+      let(:dependency) do
+        Module.new do
+          def self.call
+            :foo_response
+          end
+        end
+      end
+
+      it "returns saved dependecy" do
+        Tardigrade.add_dependency(:foo, dependency)
+
+        expect(Tardigrade.dependencies)
+          .to eq(foo: { source: dependency, memoize: false })
+      end
+    end
+  end
 end

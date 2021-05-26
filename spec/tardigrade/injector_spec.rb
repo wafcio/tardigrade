@@ -178,9 +178,10 @@ RSpec.describe Tardigrade::Injector do
     end
 
     it "returns dependency object" do
-      obj = @service_class.build_dependency(service, dependency_class)
-      expect(obj).to be_a(dependency_class)
-      expect(obj.params).to eq({ arg1: :value1 })
+      object = @service_class.build_dependency(service, dependency_class)
+      expect(object).to be_a(dependency_class)
+      expect(object.private_methods).to include(:params)
+      expect(object.send(:params)).to eq({ arg1: :value1 })
     end
   end
 
