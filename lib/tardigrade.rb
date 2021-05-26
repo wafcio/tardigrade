@@ -5,9 +5,9 @@ require "tardigrade/injector"
 require "tardigrade/version"
 
 module Tardigrade
-  def self.add_dependency(name, klass, **options)
+  def self.add_dependency(name, source, **options)
     @dependencies ||= {}
-    @dependencies[name] = { class: klass, memoize: !!options[:memoize] }
+    @dependencies[name] = { source: source, memoize: !!options[:memoize] }
   end
 
   def self.dependencies

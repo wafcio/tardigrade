@@ -15,8 +15,8 @@ RSpec.describe Tardigrade do
       Tardigrade.add_dependency(:bar, String)
 
       expect(Tardigrade.instance_variable_get(:@dependencies))
-        .to eq(foo: { class: Integer, memoize: false },
-               bar: { class: String, memoize: false })
+        .to eq(foo: { source: Integer, memoize: false },
+               bar: { source: String, memoize: false })
     end
   end
 
@@ -30,8 +30,8 @@ RSpec.describe Tardigrade do
       Tardigrade.add_dependency(:bar, String)
 
       expect(Tardigrade.dependencies)
-        .to eq(foo: { class: Integer, memoize: false },
-               bar: { class: String, memoize: false })
+        .to eq(foo: { source: Integer, memoize: false },
+               bar: { source: String, memoize: false })
     end
   end
 end

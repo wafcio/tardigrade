@@ -5,15 +5,15 @@ module Tardigrade
     end
 
     module ClassMethods
-      def build_dependency(parent_instance, dep_klass)
-        if dep_klass.respond_to?(:argument_names) && dep_klass.argument_names.size > 0
+      def build_dependency(parent_instance, source)
+        if source.respond_to?(:argument_names) && source.argument_names.size > 0
           arguments = {}
-          dep_klass.argument_names.each do |name|
+          source.argument_names.each do |name|
             arguments[name] = parent_instance.send(name)
           end
-          dep_klass.new(arguments)
+          source.new(arguments)
         else
-          dep_klass.respond_to?(:call) ? dep_klass : dep_klass.new
+          source.respond_to?(:call) ? source : source.new
         end
       end
 
@@ -34,20 +34,20 @@ module Tardigrade
       end
 
       def import(*dependency_names)
-        dependency_names.each do |dep_name|
-          dep = Tardigrade.dependencies[dep_name]
-          klass = dep[:class]
-          memoize = dep[:memoize]
+        dependency_names.each do |dependency_name|
+          dependency = Tardigrade.dependencies[dependency_name]
+          source = dependency[:source]
+          memoize = dependency[:memoize]
 
-          if call_method(klass).arity == 0
-            define_method(dep_name) do
-              result = self.class.build_dependency(self, klass).call
-              self.class.cache(dep_name, result, memoize)
+          if call_method(source).arity == 0
+            define_method(dependency_name) do
+              result = self.class.build_dependency(self, source).call
+              self.class.cache(dependency_name, result, memoize)
             end
           else
-            define_method(dep_name) do |*args|
-              result = self.class.build_dependency(self, klass).call(*args)
-              self.class.cache(dep_name, result, memoize)
+            define_method(dependency_name) do |*args|
+              result = self.class.build_dependency(self, source).call(*args)
+              self.class.cache(dependency_name, result, memoize)
             end
           end
         end
