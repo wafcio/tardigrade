@@ -10,7 +10,7 @@ RSpec.describe Tardigrade::Dependency do
       }.not_to raise_error
     end
 
-    it "save data in argument_names instance" do
+    it "saves data in argument_names instance" do
       klass = Class.new do
         include Tardigrade::Dependency
 
@@ -66,7 +66,7 @@ RSpec.describe Tardigrade::Dependency do
     }.to raise_error(ArgumentError).with_message("argument :bar missing")
   end
 
-  it "access to context method" do
+  it "accesses to context method" do
     klass = Class.new do
       include Tardigrade::Dependency
 

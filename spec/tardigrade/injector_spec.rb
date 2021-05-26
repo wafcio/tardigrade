@@ -13,7 +13,7 @@ RSpec.describe Tardigrade::Injector do
   end
 
   context "without arguments" do
-    context "with dependency class" do
+    context "with class dependency" do
       let(:dependency_class) do
         Class.new do
           def call
@@ -22,17 +22,17 @@ RSpec.describe Tardigrade::Injector do
         end
       end
 
-      it "allow to call .foo" do
+      it "allows to call .foo" do
         expect(service.foo).to eq(:foo)
       end
     end
 
-    context "with dependency as lambda" do
+    context "with lambda dependency" do
       let(:dependency_class) do
         -> { :foo }
       end
 
-      it "allow to call .foo" do
+      it "allows to call .foo" do
         expect(service.foo).to eq(:foo)
       end
     end
@@ -47,7 +47,7 @@ RSpec.describe Tardigrade::Injector do
       end
     end
 
-    it "allow to call .foo" do
+    it "allows to call .foo" do
       expect(service.foo(:foo)).to eq(:foo)
     end
   end
@@ -61,7 +61,7 @@ RSpec.describe Tardigrade::Injector do
       end
     end
 
-    it "allow to call .foo" do
+    it "allows to call .foo" do
       expect(service.foo(:foo, :bar)).to eq("foobar")
     end
   end
@@ -75,7 +75,7 @@ RSpec.describe Tardigrade::Injector do
       end
     end
 
-    it "allow to call .foo" do
+    it "allows to call .foo" do
       expect(service.foo(:foo)).to eq("foobar")
     end
   end
@@ -89,7 +89,7 @@ RSpec.describe Tardigrade::Injector do
       end
     end
 
-    it "allow to call .foo" do
+    it "allows to call .foo" do
       expect(service.foo(id: :foo)).to eq(:foo)
     end
   end
@@ -103,7 +103,7 @@ RSpec.describe Tardigrade::Injector do
       end
     end
 
-    it "allow to call .foo" do
+    it "allows to call .foo" do
       expect(service.foo(id: :foo, name: :bar)).to eq("foobar")
     end
   end
@@ -117,7 +117,7 @@ RSpec.describe Tardigrade::Injector do
       end
     end
 
-    it "allow to call .foo" do
+    it "allows to call .foo" do
       expect(service.foo(id: :foo)).to eq("foobar")
     end
   end
@@ -147,7 +147,7 @@ RSpec.describe Tardigrade::Injector do
       end
     end
 
-    it "allow to call .foo" do
+    it "allows to call .foo" do
       expect(service.foo).to eq(arg1: :value1)
     end
   end
@@ -223,7 +223,7 @@ RSpec.describe Tardigrade::Injector do
       end
     end
 
-    it "allow to call .foo" do
+    it "allows to call .foo" do
       foo1_result = service.foo1
       expect(service.foo1).to eq(foo1_result)
       expect(service.foo2).to eq(foo1_result)
@@ -256,7 +256,7 @@ RSpec.describe Tardigrade::Injector do
       end
     end
 
-    it "allow to call .foo" do
+    it "allows to call .foo" do
       service = @service_class.new
       another_service = @another_service_class.new
 
